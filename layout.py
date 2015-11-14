@@ -46,5 +46,5 @@ class Layout:
 
   
 def getLayout(name, back = 2):
-    print "Well"
+    print "Getting layout"
     return Layout(name)

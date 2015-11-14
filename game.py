@@ -4,9 +4,15 @@ from agent import AgentState
 import copy
 
 class GameState:
-  def getLegalActions(self, index):
+  def getLegalActions(self, index=0):
     if self.isWin() or self.isLose(): return []
-    return CarRules.getLegalActions(self)
+    actionSet = []
+    for action in CarRules.getLegalActions(self):
+      state = GameState(self)
+      CarRules.applyAction(state, action)
+      if not self.isLose():
+        actionSet.append(action)
+    return actionSet
 
   def generateSuccessor(self, action, agentIndex=0):
     if self.isWin() or self.isLose(): raise Exception('Can\'t generate a successor of a terminal state.')
@@ -27,12 +33,26 @@ class GameState:
       if not self.data.layout.goldenParkingSpace.contains(vertice):
         allIn = 0
     if allIn == 1:
-      print "Win!"
       return 1
     return 0
 
   def isLose(self):
+    vertices = self.data.agentStates[0].car.getVertices()
+    for vertice in vertices:
+      if vertice[0] < 0 or vertice[0] > self.data.layout.getWidth() or vertice[1] < 0 or vertice[1] > self.data.layout.getHeight():
+        #print 'Lose! (out of boundry)'
+        return 1
+      for recObstacles in self.data.layout.recObstacles:
+        if recObstacles.contains(vertice):
+          #print 'Lose! (car in obstacles)'
+          return 1
+        for v in recObstacles.getVertices():
+          if self.data.agentStates[0].car.contains(v):
+            #print 'Lose! (obstacles in car)'
+            return 1
+
     return 0
+
 
 ## Helper methods:
 
@@ -73,7 +93,10 @@ class GameStateData:
     return state
 
   def copyAgentStates(self, agentStates):
-      return copy.deepcopy(agentStates)
+      copied = []
+      for agentState in agentStates:
+        copied.append(agentState.duplicate())
+      return copied
   
   def __eq__(self, other):
     if other == None: return False
@@ -119,10 +142,11 @@ class Game:
 
     agentIndex = 0
     numAgents = len(self.agents)
+    move_time = 0
 
-    while not self.isGameOver():
+    while not self.isGameOver(self.state):
       agent = self.agents[agentIndex]
-      move_time = 0
+      move_time += 1
       observation = self.state.deepCopy()
 
       # Solicit an action
@@ -133,14 +157,22 @@ class Game:
       self.moveHistory.append(action)
       self.state = self.state.generateSuccessor(action, agentIndex )
 
+      # wait = input("continue")
+
       # Change the display
       self.display.update(self.state.data)
       
-      if agentIndex == numAgents + 1: self.numMoves += 1
+      # if agentIndex == numAgents + 1: self.numMoves += 1
       # Next agent
-      agentIndex = (agentIndex + 1) % numAgents
+      # agentIndex = (agentIndex + 1) % numAgents
 
    ## self.display.finish()
+    if self.state.isWin():
+      print "Win!"
+    print "Move %d Times" % move_time
+    print self.moveHistory
 
-  def isGameOver(self):
-      return 0
+  def isGameOver(self, gameState):
+    if gameState.isWin() or gameState.isLose():
+      return 1
+    return 0

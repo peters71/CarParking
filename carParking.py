@@ -16,12 +16,13 @@ class ClassicGameRules:
 
 class CarRules:
   def getLegalActions(state):
+    # return [Directions.FORWARD, Directions.LEFT, Directions.RIGHT] 
     return [Directions.FORWARD, Directions.BACKWARD, Directions.LEFT, Directions.RIGHT, Directions.RLEFT, Directions.RRIGHT, Directions.STOP] 
   getLegalActions = staticmethod(getLegalActions)
 
   def applyAction(state, action):
     carState = state.data.agentStates[0]
-    carState.car.generateSuccessor(action)
+    carState.car.update(action)
   applyAction = staticmethod(applyAction)
   
 def default(str):
@@ -82,7 +83,7 @@ def loadAgent(driver):
 
   for moduleDir in pythonPathDirs:
     if not os.path.isdir(moduleDir): continue
-    moduleNames = [f for f in os.listdir(moduleDir) if f.endswith('gents.py') or f=='submission.py']
+    moduleNames = [f for f in os.listdir(moduleDir) if f.endswith('gents.py') or f=='submission.py' or f=='agent.py']
     for modulename in moduleNames:
       try:
         module = __import__(modulename[:-3])

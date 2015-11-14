@@ -20,7 +20,7 @@ class RecObstacle(Obstacle):
     return (self.length, self.width)
   
   def getCenterAndOrient(self):
-    return (self.center, self.orientation)
+    return ((self.center_x, self.center_y), self.orientation)
 
   def getVertices(self):
     dx1 = self.length * math.cos(self.orientation)/2
