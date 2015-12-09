@@ -2,6 +2,7 @@ import math
 from carParking import CarRules
 from agent import AgentState
 import copy
+from collections import Counter
 
 class GameState:
   def getLegalActions(self, index=0):
@@ -169,7 +170,18 @@ class Game:
    ## self.display.finish()
     if self.state.isWin():
       print "Win!"
+    elif self.state.isLose():
+      print "Lose..."
+
+    print "Total %d Time" % move_time
+
+    actionHistory = Counter(self.moveHistory)
+    move_time -= actionHistory[(0,0)]
+
     print "Move %d Times" % move_time
+    print actionHistory
+    print '----------------------------------------'
+    # print [x for i,x in enumerate(self.moveHistory) if x != (0,0)]
     print self.moveHistory
 
   def isGameOver(self, gameState):
