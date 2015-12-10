@@ -28,6 +28,7 @@ class KeyboardAgent(Agent):
     if keys != []:
       self.keys = keys
     self.keys = keys
+
     legal = state.getLegalActions(self.index)
     move = self.getMove(legal)
     
@@ -37,6 +38,9 @@ class KeyboardAgent(Agent):
       move = random.choice(legal)
       
     self.lastMove = move
+
+    # print self.keys, move
+
     return move
 
   def getMove(self, legal):

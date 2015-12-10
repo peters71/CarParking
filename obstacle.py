@@ -47,7 +47,11 @@ class RecObstacle(Obstacle):
 
   def scale(self, wl, ww):
     self.length = self.length * wl
-    self.width = self.width*wl
+    self.width = self.width*ww
+
+  def __str__(self):
+    return "(x,y,theta)="+str(self.center_x)+', '+str(self.center_y)+', '+str(self.orientation)
+
 
 class SquareObstacle(RecObstacle):
   def __init__(self, center_x, center_y, length, orientation=0):
