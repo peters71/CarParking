@@ -27,16 +27,18 @@ class BeamSearchAgent(Agent):
 
     if len(self.plannedActions) > 0:
       action = self.plannedActions.pop(0)
-      #print 'plannedActions'
+      # print 'plannedActions', self.plannedActions
       #print action
       return action
 
     beamSearch = 20
     depth = 50
+    firstX = 10
     gameStateListNextLevel = []
     level = 1
 
     legalMoves = gameState.getLegalActions()
+    legalMoves = [x for x in legalMoves if x != (0,0)]
     gameStateList = []
     for action in legalMoves:
       gameStateList.append((gameState, [action]))
@@ -66,6 +68,7 @@ class BeamSearchAgent(Agent):
     gameStateListBackup = copy.deepcopy(gameStateList)
 
     while 1:
+
       if len(gameStateList) > 0:
         gameState, actionHistory = gameStateList.pop(0)
       else:
@@ -113,7 +116,7 @@ class BeamSearchAgent(Agent):
       newState = gameState.generateSuccessor(actionPrev)
       if newState.isWin():
         self.plannedActions = actionHistory
-        self.plannedActions = [x for x in self.plannedActions if x != (0,0)]
+        # self.plannedActions = [x for x in self.plannedActions if x != (0,0)]
         action = self.plannedActions.pop(0)
         #print 'isWin'
         #print action
@@ -127,7 +130,7 @@ class BeamSearchAgent(Agent):
       #  print '___________________'
       #  continue
       
-      if duplicateFlag == 1 and actionPrev != (0,0):
+      if duplicateFlag == 1:
         for carPrevState in self.stateHistory:
           if carNewState == carPrevState:
             newState = None
@@ -148,6 +151,7 @@ class BeamSearchAgent(Agent):
         continue
 
       legalMoves = newState.getLegalActions()
+      legalMoves = [x for x in legalMoves if x != (0,0)]
       if len(actionHistory)%10 == 0:
         for action in legalMoves:
           gameStateListNextLevel.append((newState, actionHistory + [action]))
@@ -179,9 +183,13 @@ class BeamSearchAgent(Agent):
     action = gameStateList[chosenIndex][1][0]
     self.plannedActions = gameStateList[chosenIndex][1]
 
-    self.plannedActions = [x for x in self.plannedActions if x != (0,0)][0:10]
-    if len(self.plannedActions) == 0:
-      self.plannedActions = [(0,0)]
+    # plannedActionsNonStop = [x for x in self.plannedActions if x != (0,0)]
+
+    # print 'plannedActionsNonStop', plannedActionsNonStop
+
+    self.plannedActions = self.plannedActions[0:firstX]
+    # if len(self.plannedActions) == 0:
+    #  self.plannedActions = [(0,0)]
 
     # print self.plannedActions 
     # input('')
@@ -202,13 +210,13 @@ class BeamSearchAgent(Agent):
     centerObs, orientObs = park.getCenterAndOrient()
     dist = ((centerCar[0] - centerObs[0])**2 + (centerCar[1] - centerObs[1])**2)**0.5
     angle = math.atan((centerCar[1] - centerObs[1])/(centerCar[0] - centerObs[0]))
-    orientDiff = min([abs(orientCar - orientObs - 3.14159), abs(orientCar - orientObs)])
+    orientDiff = min([abs(orientCar - orientObs - 3.14159), abs(orientCar - orientObs), abs(orientCar - orientObs + 3.14159)])
     numInPark = 0
     for v in car.getVertices():
       if park.contains(v):
         numInPark += 1
     if numInPark == 0: 
-      return -dist/250 - abs(angle - orientCar) 
+      return -dist/250 - min(abs(angle - orientCar), abs(angle - orientCar - 3.14159), abs(angle - orientCar + 3.14159))
     else:
       return numInPark*100 + 1.0/dist + 0.1/orientDiff# - angle/180*math.pi
 
