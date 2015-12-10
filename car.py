@@ -9,6 +9,11 @@ class Car:
     self.center_y = center_y
     self.orientation = orientation
 
+  def setPosAndOrient(self, PosAndOrientInfo):
+    self.center_x = PosAndOrientInfo[0][0] - 35
+    self.center_y = PosAndOrientInfo[0][1]
+    self.orientation = PosAndOrientInfo[1]
+
   def getSize(self):
     return (self.geometry.length, self.geometry.width)
 

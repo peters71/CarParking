@@ -3,17 +3,38 @@ from carParking import CarRules
 from agent import AgentState
 import copy
 from collections import Counter
+from TwoStepAgents import TwoStepAgent
 
 class GameState:
+
+  def getLegalActions_Middle(self, index=0):
+    if self.isLose(): return []
+    actionSet = []
+    for action in CarRules.getLegalActions(self):
+      state = GameState(self)
+      CarRules.applyAction(state, action)
+      if not state.isLose():
+        actionSet.append(action)
+    return actionSet
+
   def getLegalActions(self, index=0):
     if self.isWin() or self.isLose(): return []
     actionSet = []
     for action in CarRules.getLegalActions(self):
       state = GameState(self)
       CarRules.applyAction(state, action)
-      if not self.isLose():
+      if not state.isLose():
         actionSet.append(action)
     return actionSet
+
+  def generateSuccessor_Middle(self, action, agentIndex=0):
+    # if self.isWin() or self.isLose(): raise Exception('Can\'t generate a successor of a terminal state.')
+    state = GameState(self)
+    CarRules.applyAction(state, action)
+
+    # Book keeping
+    self.data._agentMoved = agentIndex
+    return state
 
   def generateSuccessor(self, action, agentIndex=0):
     if self.isWin() or self.isLose(): raise Exception('Can\'t generate a successor of a terminal state.')
@@ -88,6 +109,9 @@ class GameStateData:
     self._lose = False
     self._win = False
 
+  def getPosition(self):
+    return self.agentStates[0].getPosAndOrient()
+
   def deepCopy(self):
     state = GameStateData(self)
     state.layout = self.layout.deepCopy()
@@ -153,6 +177,7 @@ class Game:
       # Solicit an action
       action = None
       action = agent.getAction(observation)
+      # print action
 
       # Execute the action
       self.moveHistory.append(action)
@@ -161,6 +186,9 @@ class Game:
       # wait = input("continue")
 
       # Change the display
+      if isinstance(agent, TwoStepAgent):
+        self.display.drawMiddleState(agent.middleState)
+
       self.display.update(self.state.data)
       
       # if agentIndex == numAgents + 1: self.numMoves += 1
