@@ -42,6 +42,10 @@ class Car:
     self.center_x += dx
     self.center_y += dy
     self.orientation += dtheta
+    if self.orientation > math.pi:
+      self.orientation -= 2 * math.pi
+    if self.orientation < -math.pi:
+      self.orientation += 2 * math.pi
 
   def contains(self, v):
     # The true center of the car with speed bumper considered
