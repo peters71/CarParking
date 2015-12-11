@@ -20,6 +20,9 @@ class Car:
   def getPosAndOrient(self):
     return ((self.center_x, self.center_y), self.orientation)
 
+  def getCenterAndOrient(self):
+    return ((self.center_x + 25 * math.cos(self.orientation), self.center_y + 25 * math.sin(self.orientation)), self.orientation)
+
   def getVertices(self):
     x1 = self.center_x - self.geometry.d * math.cos(self.orientation)
     y1 = self.center_y - self.geometry.d * math.sin(self.orientation)
