@@ -9,10 +9,22 @@ class Car:
     self.center_y = center_y
     self.orientation = orientation
 
-  def setPosAndOrient(self, PosAndOrientInfo):
-    self.center_x = PosAndOrientInfo[0][0] - 35
-    self.center_y = PosAndOrientInfo[0][1]
-    self.orientation = PosAndOrientInfo[1]
+  def setPosAndOrient(self, CenterAndOrientInfo):
+    self.orientation = CenterAndOrientInfo[1]
+    l = (self.geometry.bumper + self.geometry.length) * 1.0/2 - self.geometry.d
+    l = 35
+    self.center_x = CenterAndOrientInfo[0][0] - l * math.cos(self.orientation)
+    self.center_y = CenterAndOrientInfo[0][1] - l * math.sin(self.orientation)
+    
+  def setPosAndOrientReverse(self, CenterAndOrientInfo):
+    if CenterAndOrientInfo[1] >=0:
+        self.orientation = CenterAndOrientInfo[1] - 3.14159
+    else:
+        self.orientation = CenterAndOrientInfo[1] + 3.14159
+    l = (self.geometry.bumper + self.geometry.length) * 1.0/2 - self.geometry.d
+    self.center_x = CenterAndOrientInfo[0][0] - l * math.cos(self.orientation)
+    self.center_y = CenterAndOrientInfo[0][1] - l * math.sin(self.orientation)
+    
 
   def getSize(self):
     return (self.geometry.length, self.geometry.width)
@@ -22,7 +34,7 @@ class Car:
 
   def getCenterAndOrient(self):
     l = (self.geometry.bumper + self.geometry.length) * 1.0/2 - self.geometry.d
-    l = 39
+    # l = 39
     return ((self.center_x +  l * math.cos(self.orientation), self.center_y + l * math.sin(self.orientation)), self.orientation)
 
   def getVertices(self):
