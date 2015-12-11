@@ -163,6 +163,7 @@ class Game:
 
   def run(self):
     self.display.initialize(self.state.data)
+    drawn = 0
 
     agentIndex = 0
     numAgents = len(self.agents)
@@ -185,8 +186,9 @@ class Game:
       # wait = input("continue")
 
       # Change the display
-      if isinstance(agent, TwoStepAgent):
+      if isinstance(agent, TwoStepAgent) and not drawn:
         self.display.drawMiddleState(agent.middleState)
+        drawn = 1
 
       self.display.update(self.state.data)
       

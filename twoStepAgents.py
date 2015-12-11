@@ -7,6 +7,7 @@ import copy
 import game
 from actions import Directions
 from evaluationFunctions import *
+from obstacle import *
 
 class TwoStepAgent(Agent):
 
@@ -287,7 +288,7 @@ class TwoStepAgent(Agent):
 				numInPark += 1
 
 
-		score1 = -numInPark*100 + dist - 200 * (centerCar[1] - centerObs[1])+ 0.1/(orientDiff+0.01)
+		score1 = -numInPark*100 + dist*102 - 200 * (centerCar[1] - centerObs[1])+ 0.1/(orientDiff+0.01)
 
 		carInit = initialState.data.agentStates[0].car
 		centerCarInit, orientCarInit = carInit.getPosAndOrient()
@@ -300,9 +301,28 @@ class TwoStepAgent(Agent):
 			# print "angles", angle, orientCarInit, bestAngle, orientCar
 
 		score2 = abs(bestAngle - orientCar)
-		# print score1, score2
+                
+		center, orient = car.getCenterAndOrient();
+		prot = 30.0
+		tail = 20.0
+		side = 10.0
+		carShade = RecObstacle(center[0] + (prot - tail)/2*math.cos(orient), center[1] + (prot - tail)/2*math.sin(orient), car.geometry.length + prot + tail, car.geometry.width + side, orient)
+		num = 0
+		layout = initialState.data.layout
+		obstacles = layout.getRecObstacles()
+		for obstacle in obstacles:
+		    for v in carShade.getVertices():
+		        if obstacle.contains(v):
+		            num += 1
+		    for v in obstacle.getVertices():
+		        if carShade.contains(v):
+		            num += 1
+		score3 = -num
 
-		return score1 + 15*score2
+		print numInPark, dist
+		# print score1*0.005, score2*15, score3*100
+
+		return score1*0.005 - 15*score2 + 100*score3
 
 	def calculateCarPos(self, gameState):
 		carState = gameState.getCarPosition()

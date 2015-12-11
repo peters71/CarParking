@@ -42,7 +42,7 @@ class EvaluationFunction:
             angle = angle + math.pi
         if (centerObs[1] < centerCar[1]) and (angle > 0):
             angle = angle - math.pi
-        print 'angle', angle, orientCar
+        # print 'angle', angle, orientCar
         # orientDiff1 = min(abs(angle - orientCar), abs(angle - orientCar - 3.14159), abs(angle - orientCar + 3.14159))
         # orientDiff2 = min(abs(orientObs - orientCar), abs(orientObs - orientCar - 3.14159), abs(orientObs - orientCar + 3.14159))
         orientDiff1 = abs(angle - orientCar)
