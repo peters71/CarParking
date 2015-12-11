@@ -47,28 +47,37 @@ class TwoStepAgent(Agent):
 		# print destinationState.getCarPosition()
 
 		numAction = 100
-		firstX = 15
+		firstX = 50
 		itr = numAction/firstX
 
-		statein = destinationState
-                """
-		for _ in range(itr):
+		# statein = destinationState
+		destinationStateOne = destinationState
+		destinationStateTwo = destinationState
+		'''     
+		for t in range(itr):
 			print 'beam search'
 			ActionsFromMiddleState = self.beamSearch(statein, numAction, gameState)
 			print ActionsFromMiddleState
-			actionTaken = ActionsFromMiddleState[0:firstX]
+			actionTaken = ActionsFromMiddleState[0:firstX * (1+(t==itr-1))]
 			self.ActionReverse += actionTaken
 			state = statein
-			for i in range(firstX):
+			for i in range(firstX * (1+(t==itr-1))):
 				state = state.generateSuccessor_Middle(actionTaken[i])
 			statein = state
-                """
-		ActionsFromMiddleState = self.beamSearch(statein, numAction, gameState)
-                
+		'''
+		middleStateOne, bestScoreOne = self.beamSearch(destinationStateOne, numAction, gameState)
+		middleStateTwo, bestScoreTwo = self.beamSearch(destinationStateTwo, numAction, gameState)
 
-		#self.middleState = statein
+		if bestScoreOne > bestScoreTwo:
+			self.middleState = middleStateOne
+		else:
+			self.middleState = middleStateTwo
+
 		self.middleStatePos = self.calculateCarPos(self.middleState)
-                print self.middleStatePos
+
+		# self.middleState = statein
+		# self.middleStatePos = self.calculateCarPos(self.middleState)
+		print self.middleStatePos
 
 		print '---------------============-------------'
 		print len(self.ActionReverse)
@@ -85,6 +94,10 @@ class TwoStepAgent(Agent):
 		# Orient = Orient/3.14*180
 		# stateHistory.append(((int(center_x), int(center_y)), int(Orient)))
 
+		bestScoreMiddle = float('-inf');
+		countMiddle = 0
+		bestScoreGameList = []
+
 		beamSearch = 50
 		depth = numAction
 		gameStateListNextLevel = []
@@ -97,15 +110,15 @@ class TwoStepAgent(Agent):
 		for action in legalMoves:
 			gameStateList.append((gameState, [action]))
 
+		random.shuffle(gameStateList)
+		scores = []
+		for state, action in gameStateList:
+			newState = state.generateSuccessor_Middle(action[-1])
+			scoreTemp = self.EvalMiddle(initialState, newState)
+			scores.append(scoreTemp)
+
 		if len(gameStateList) > beamSearch:
-			random.shuffle(gameStateList)
-
-			scores = []
-			for state, action in gameStateList:
-				newState = state.generateSuccessor_Middle(action[-1])
-				scoreTemp = self.EvalMiddle(initialState, newState)
-				scores.append(scoreTemp)
-
+			
 			# print scores
 			idx = zip(*heapq.nlargest(beamSearch, enumerate(scores), key=operator.itemgetter(1)))[0]
 
@@ -114,6 +127,9 @@ class TwoStepAgent(Agent):
 				gameStateListTemp.append(gameStateList[i])
 
 			gameStateList = gameStateListTemp
+
+		bestScoreMiddle = max(scores)
+		bestScoreGameList = copy.deepcopy(gameStateList)
 
 		gameStateListBackup = copy.deepcopy(gameStateList)
 
@@ -147,12 +163,33 @@ class TwoStepAgent(Agent):
 
 					gameStateList = gameStateListTemp
 
+				scoresSelected = []
+				for state, action in gameStateList:
+					newState = state.generateSuccessor_Middle(action[-1])
+					scoreTemp = self.EvalMiddle(initialState, newState)
+					scoresSelected.append(scoreTemp)
+
+				if bestScoreMiddle < max(scoresSelected):
+					countMiddle = 0
+					bestScoreMiddle = max(scoresSelected)
+					bestScoreGameList = copy.deepcopy(gameStateList)
+				else:
+					countMiddle += 1
+					print countMiddle
+					if countMiddle >= 15:
+						gameStateList = copy.deepcopy(bestScoreGameList)
+						print len(gameStateList[0][1])
+						input('123')
+						break
+
 				gameState, actionHistory = gameStateList.pop(0)
 
-			# print len(actionHistory), len(gameStateList)+1
+			# print len(actionHistory)
 			# print gameStateList
 
 			if len(actionHistory) == depth:
+				print len(actionHistory)
+				input('stop')
 				gameStateList.append((gameState, actionHistory))
 				break
 
@@ -177,6 +214,12 @@ class TwoStepAgent(Agent):
 
 			# print '---------------------'
 
+		print '123123'
+		print countMiddle
+		print '123123'
+		print len(gameStateList[0][1])
+		print '12123123'
+
 		scores = []
 		for state, action in gameStateList:
 			newState = state.generateSuccessor_Middle(action[-1])
@@ -192,12 +235,12 @@ class TwoStepAgent(Agent):
 		action = gameStateList[chosenIndex][1][-1]
 		# print action
 		carState = gameStateList[chosenIndex][0].generateSuccessor_Middle(action).getCarPosition()
-                self.middleState = gameStateList[chosenIndex][0].generateSuccessor_Middle(action);
+		middleState = gameStateList[chosenIndex][0].generateSuccessor_Middle(action)
 
 		(center_x, center_y), Orient = carState
 		Orient = Orient/3.14*180
 
-		self.middleStatePos = ((int(center_x), int(center_y)), int(Orient))
+		# self.middleStatePos = ((int(center_x), int(center_y)), int(Orient))
 		
 		# (ActionList) = gameStateList[chosenIndex][1]
 
@@ -207,13 +250,13 @@ class TwoStepAgent(Agent):
 
 		action = gameStateList[chosenIndex][1][-1]
 		# return gameStateList[chosenIndex][0].generateSuccessor_Middle(action)
-		return gameStateList[chosenIndex][1]
 
+		return (middleState, bestScoreMiddle)
 
-        def isClose(self, pos1, pos2):
-            #print "d", (pos1[0][0] - pos2[0][0])**2 + (pos1[0][1] - pos2[0][1])**2
-            #print "o", abs(pos1[1] - pos2[1])
-            return ((pos1[0][0] - pos2[0][0])**2 + (pos1[0][1] - pos2[0][1])**2 + 10000*abs(pos1[1] - pos2[1]) < 300)
+	def isClose(self, pos1, pos2):
+		# print "d", (pos1[0][0] - pos2[0][0])**2 + (pos1[0][1] - pos2[0][1])**2
+		# print "o", abs(pos1[1] - pos2[1])
+		return ((pos1[0][0] - pos2[0][0])**2 + (pos1[0][1] - pos2[0][1])**2 + 10000*abs(pos1[1] - pos2[1]) < 300)
 
 	def EvalMiddle(self, initialState, middleState):
 
@@ -236,16 +279,17 @@ class TwoStepAgent(Agent):
 		carInit = initialState.data.agentStates[0].car
 		centerCarInit, orientCarInit = carInit.getPosAndOrient()
 		angle = math.atan((centerCar[1] - centerCarInit[1])/(centerCar[0] - centerCarInit[0]))
-                if ((centerCar[1] - centerCarInit[1]) > 0 and angle < 0):
-                    angle += math.pi
-                #print centerCar, centerCarInit
+
+		if ((centerCar[1] - centerCarInit[1]) > 0 and angle < 0):
+			angle += math.pi
+			# print centerCar, centerCarInit
 		bestAngle = 2 * angle - orientCarInit
-                #print "angles", angle, orientCarInit, bestAngle, orientCar
+			# print "angles", angle, orientCarInit, bestAngle, orientCar
 
 		score2 = abs(bestAngle - orientCar)
-                #print score1, score2
+		# print score1, score2
 
-		return score1 + 2000*score2
+		return score1 + 15*score2
 
 	def calculateCarPos(self, gameState):
 		carState = gameState.getCarPosition()
@@ -356,14 +400,14 @@ class TwoStepAgent(Agent):
 				#print action
 				return action
 
-                        if not self.middleStateFound:
-                            if self.isClose(self.calculateCarPos(newState), self.middleStatePos):
-				input('reach middle state')
-				# action = self.ActionsFromMiddleState.pop(-1)
-				self.middleStateFound = 1
-				self.plannedActions = actionHistory
-				action = self.plannedActions.pop(0)
-				return action
+			if not self.middleStateFound:
+				if self.isClose(self.calculateCarPos(newState), self.middleStatePos):
+					input('reach middle state')
+					# action = self.ActionsFromMiddleState.pop(-1)
+					self.middleStateFound = 1
+					self.plannedActions = actionHistory
+					action = self.plannedActions.pop(0)
+					return action
 
 
 			carNewState = newState.data.agentStates[0].car.getPosAndOrient()
@@ -444,13 +488,13 @@ class TwoStepAgent(Agent):
 		#print action
 		return action
 
-	def evaluationFunction(self, state, action):
+	def evaluationFunction(self, state, action):	
 
 		if self.middleStateFound == 0:
-                    return EvaluationFunction.evaluateMiddle(state, action, self.middleState)
+			return EvaluationFunction.evaluateMiddle(state, action, self.middleState)
 
 		else:
-                    return EvaluationFunction.evaluateParking(state, action)
+			return EvaluationFunction.evaluateParking(state, action)
 
 
 

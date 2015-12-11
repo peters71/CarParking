@@ -61,7 +61,10 @@ class carParkingGraphics:
     self.moveCar(agentState, prevImage)
 
   def moveCar(self, agentState, image):
-      moVe_to(image, *agentState.car.getVertices())
+    moVe_to(image, *agentState.car.getVertices())
+    (x, y) = (agentState.car.center_x, agentState.car.center_y)
+    V_point = [(x - 1, y - 1), (x + 1, y - 1), (x - 1, y + 1), (x + 1, y + 1)]
+    polygon(V_point, formatColor(0, 0, 1))
 
   def drawMiddleState(self, middleState):
     return polygon(middleState.data.agentStates[0].car.getVertices(), formatColor(1, 0, 1))
