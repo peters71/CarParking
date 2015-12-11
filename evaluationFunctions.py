@@ -12,15 +12,20 @@ class EvaluationFunction:
         centerObs, orientObs = park.getCenterAndOrient()
         dist = ((centerCar[0] - centerObs[0])**2 + (centerCar[1] - centerObs[1])**2)**0.5
         angle = math.atan((centerCar[1] - centerObs[1])/(centerCar[0] - centerObs[0]))
-        orientDiff = min([abs(orientCar - orientObs - 3.14159), abs(orientCar - orientObs), abs(orientCar - orientObs + 3.14159)])
+        if (centerObs[1] > centerCar[1]) and (angle < 0):
+            angle = -angle
+        if (centerObs[1] < centerCar[1]) and (angle > 0):
+            angle = -angle
+        orientDiff1 = abs(orientCar - angle)
+        orientDiff2 = abs(orientCar - orientObs)
         numInPark = 0
         for v in car.getVertices():
             if park.contains(v):
                 numInPark += 1
         if numInPark == 0: 
-            return -dist/250 - min(abs(angle - orientCar), abs(angle - orientCar - 3.14159), abs(angle - orientCar + 3.14159))
+            return -dist/250 - orientDiff1
         else:
-            return numInPark*100 + 1.0/dist + 0.1/(orientDiff + 0.01)# - angle/180*math.pi
+            return numInPark*100 - dist - (orientDiff2 + 0.01)
 
     @staticmethod
     def evaluateMiddle(state, action, middleState):
@@ -31,6 +36,11 @@ class EvaluationFunction:
         centerObs, orientObs = car2.getCenterAndOrient()
         dist = ((centerCar[0] - centerObs[0])**2 + (centerCar[1] - centerObs[1])**2)**0.5
         angle = math.atan((centerCar[1] - centerObs[1])/(centerCar[0] - centerObs[0]))
-        orientDiff = min([abs(orientCar - orientObs - 3.14159), abs(orientCar - orientObs), abs(orientCar - orientObs + 3.14159)])
-        return -dist/250 - min(abs(angle - orientCar), abs(angle - orientCar - 3.14159), abs(angle - orientCar + 3.14159)) - 0.5 * min(abs(orientObs - orientCar), abs(orientObs - orientCar - 3.14159), abs(orientObs - orientCar + 3.14159))
+        if (centerObs[1] > centerCar[1]) and (angle < 0):
+            angle = -angle
+        if (centerObs[1] < centerCar[1]) and (angle > 0):
+            angle = -angle
+        orientDiff1 = abs(angle - orientCar)
+        orientDiff2 = abs(orientObs - orientCar)
+        return -dist/250 -  orientDiff1 - orientDiff2
 

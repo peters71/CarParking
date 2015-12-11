@@ -211,8 +211,8 @@ class TwoStepAgent(Agent):
 
 
         def isClose(self, pos1, pos2):
-            print "d", (pos1[0][0] - pos2[0][0])**2 + (pos1[0][1] - pos2[0][1])**2
-            print "o", abs(pos1[1] - pos2[1])
+            #print "d", (pos1[0][0] - pos2[0][0])**2 + (pos1[0][1] - pos2[0][1])**2
+            #print "o", abs(pos1[1] - pos2[1])
             return ((pos1[0][0] - pos2[0][0])**2 + (pos1[0][1] - pos2[0][1])**2 + 10000*abs(pos1[1] - pos2[1]) < 300)
 
 	def EvalMiddle(self, initialState, middleState):
@@ -238,12 +238,12 @@ class TwoStepAgent(Agent):
 		angle = math.atan((centerCar[1] - centerCarInit[1])/(centerCar[0] - centerCarInit[0]))
                 if ((centerCar[1] - centerCarInit[1]) > 0 and angle < 0):
                     angle += math.pi
-                print centerCar, centerCarInit
+                #print centerCar, centerCarInit
 		bestAngle = 2 * angle - orientCarInit
-                print "angles", angle, orientCarInit, bestAngle, orientCar
+                #print "angles", angle, orientCarInit, bestAngle, orientCar
 
 		score2 = abs(bestAngle - orientCar)
-                print score1, score2
+                #print score1, score2
 
 		return score1 + 2000*score2
 

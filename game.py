@@ -3,7 +3,7 @@ from carParking import CarRules
 from agent import AgentState
 import copy
 from collections import Counter
-from TwoStepAgents import TwoStepAgent
+from twoStepAgents import TwoStepAgent
 
 class GameState:
 
