@@ -12,7 +12,7 @@ class Car:
   def setPosAndOrient(self, CenterAndOrientInfo):
     self.orientation = CenterAndOrientInfo[1]
     l = (self.geometry.bumper + self.geometry.length) * 1.0/2 - self.geometry.d
-    l = 35
+    # l = 35
     self.center_x = CenterAndOrientInfo[0][0] - l * math.cos(self.orientation)
     self.center_y = CenterAndOrientInfo[0][1] - l * math.sin(self.orientation)
     

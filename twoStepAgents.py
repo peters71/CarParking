@@ -50,7 +50,7 @@ class TwoStepAgent(Agent):
 		#else:
 		#	destStateCenterAndOrientInfo[1] = orient + 3.14159
 		destinationStateTwo = gameState.deepCopy()
-		destinationStateTwo.data.agentStates[0].car.setPosAndOrient(destStateCenterAndOrientInfo)
+		destinationStateTwo.data.agentStates[0].car.setPosAndOrientReverse(destStateCenterAndOrientInfo)
 		# destinationState.data.agentStates[0].car.setPosAndOrientReverse(destStateCenterAndOrientInfo)
 
 		# print destinationState.getCarPosition()
@@ -76,6 +76,8 @@ class TwoStepAgent(Agent):
 		'''
 		middleStateOne, bestScoreOne = self.beamSearch(destinationStateOne, numAction, gameState)
 		middleStateTwo, bestScoreTwo = self.beamSearch(destinationStateTwo, numAction, gameState)
+
+		print bestScoreOne, bestScoreTwo
 
 		if bestScoreOne > bestScoreTwo:
 			self.middleState = middleStateOne
@@ -108,7 +110,7 @@ class TwoStepAgent(Agent):
 		countMiddle = 0
 		bestScoreGameList = []
 
-		beamSearch = 80
+		beamSearch = 50
 		depth = numAction
 		gameStateListNextLevel = []
 		
@@ -185,11 +187,10 @@ class TwoStepAgent(Agent):
 					bestScoreGameList = copy.deepcopy(gameStateList)
 				else:
 					countMiddle += 1
-					print countMiddle
+					# print countMiddle
 					if countMiddle >= 15:
 						gameStateList = copy.deepcopy(bestScoreGameList)
-						print len(gameStateList[0][1])
-						input('123')
+						# print len(gameStateList[0][1])
 						break
 
 				gameState, actionHistory = gameStateList.pop(0)
@@ -198,8 +199,7 @@ class TwoStepAgent(Agent):
 			# print gameStateList
 
 			if len(actionHistory) == depth:
-				print len(actionHistory)
-				input('stop')
+				# print len(actionHistory)
 				gameStateList.append((gameState, actionHistory))
 				break
 
@@ -224,11 +224,11 @@ class TwoStepAgent(Agent):
 
 			# print '---------------------'
 
-		print '123123'
-		print countMiddle
-		print '123123'
-		print len(gameStateList[0][1])
-		print '12123123'
+		# print '123123'
+		# print countMiddle
+		# print '123123'
+		# print len(gameStateList[0][1])
+		# print '12123123'
 
 		scores = []
 		for state, action in gameStateList:
@@ -257,7 +257,9 @@ class TwoStepAgent(Agent):
 		# for action in ActionList:
 		#	a1, a2 = action
 		#	self.ActionsFromMiddleState.append((a1, a2))
-
+		print '================================'
+		print len(gameStateList[chosenIndex][1])
+		print gameStateList[chosenIndex][1]
 		action = gameStateList[chosenIndex][1][-1]
 		# return gameStateList[chosenIndex][0].generateSuccessor_Middle(action)
 
