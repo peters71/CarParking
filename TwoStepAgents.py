@@ -48,7 +48,9 @@ class TwoStepAgent(Agent):
 		firstX = 50
 		itr = numAction/firstX
 
-		statein = destinationState
+		# statein = destinationState
+		destinationStateOne = destinationState
+		destinationStateTwo = destinationState
 		'''     
 		for t in range(itr):
 			print 'beam search'
@@ -61,8 +63,15 @@ class TwoStepAgent(Agent):
 				state = state.generateSuccessor_Middle(actionTaken[i])
 			statein = state
 		'''
-		ActionsFromMiddleState = self.beamSearch(statein, numAction, gameState)
-                
+		middleStateOne, bestScoreOne = self.beamSearch(destinationStateOne, numAction, gameState)
+		middleStateTwo, bestScoreTwo = self.beamSearch(destinationStateTwo, numAction, gameState)
+
+		if bestScoreOne > bestScoreTwo:
+			self.middleState = middleStateOne
+		else:
+			self.middleState = middleStateTwo
+
+		self.middleStatePos = self.calculateCarPos(self.middleState)
 
 		# self.middleState = statein
 		# self.middleStatePos = self.calculateCarPos(self.middleState)
@@ -225,12 +234,12 @@ class TwoStepAgent(Agent):
 		# print action
 		# input('fuck')
 		carState = gameStateList[chosenIndex][0].generateSuccessor_Middle(action).getCarPosition()
-		self.middleState = gameStateList[chosenIndex][0].generateSuccessor_Middle(action)
+		middleState = gameStateList[chosenIndex][0].generateSuccessor_Middle(action)
 
 		(center_x, center_y), Orient = carState
 		Orient = Orient/3.14*180
 
-		self.middleStatePos = ((int(center_x), int(center_y)), int(Orient))
+		# self.middleStatePos = ((int(center_x), int(center_y)), int(Orient))
 		
 		# (ActionList) = gameStateList[chosenIndex][1]
 
@@ -240,7 +249,8 @@ class TwoStepAgent(Agent):
 
 		action = gameStateList[chosenIndex][1][-1]
 		# return gameStateList[chosenIndex][0].generateSuccessor_Middle(action)
-		return gameStateList[chosenIndex][1]
+
+		return (middleState, bestScoreMiddle)
 
 
 	def isClose(self, pos1, pos2):
