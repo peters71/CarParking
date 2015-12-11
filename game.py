@@ -28,7 +28,6 @@ class GameState:
     return actionSet
 
   def generateSuccessor_Middle(self, action, agentIndex=0):
-    # if self.isWin() or self.isLose(): raise Exception('Can\'t generate a successor of a terminal state.')
     state = GameState(self)
     CarRules.applyAction(state, action)
 
