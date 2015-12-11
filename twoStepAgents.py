@@ -80,6 +80,11 @@ class TwoStepAgent(Agent):
 
 		print bestScoreOne, bestScoreTwo
 
+		print '++++++++++++++++++++++++++++++++'
+		self.EvalMiddle(gameState, middleStateOne)
+		self.EvalMiddle(gameState, middleStateTwo)
+
+
 		if bestScoreOne > bestScoreTwo:
 			self.middleState = middleStateOne
 		else:
@@ -189,7 +194,7 @@ class TwoStepAgent(Agent):
 				else:
 					countMiddle += 1
 					# print countMiddle
-					if countMiddle >= 15:
+					if countMiddle >= 20:
 						gameStateList = copy.deepcopy(bestScoreGameList)
 						# print len(gameStateList[0][1])
 						break
@@ -287,8 +292,8 @@ class TwoStepAgent(Agent):
 			if park.contains(v):
 				numInPark += 1
 
-
-		score1 = -numInPark*100 + dist*102 - 200 * (centerCar[1] - centerObs[1])+ 0.1/(orientDiff+0.01)
+		print -numInPark*100, dist, 100 * abs(centerCar[1] - centerObs[1]), 0.1/(orientDiff+0.01)
+		score1 = -numInPark*100 + dist + 100 * abs(centerCar[1] - centerObs[1])+ 0.1/(orientDiff+0.01)
 
 		carInit = initialState.data.agentStates[0].car
 		centerCarInit, orientCarInit = carInit.getPosAndOrient()
@@ -296,14 +301,19 @@ class TwoStepAgent(Agent):
 
 		if ((centerCar[1] - centerCarInit[1]) > 0 and angle < 0):
 			angle += math.pi
+		if (centerObs[1] < centerCar[1]) and (angle > 0):
+			angle -= math.pi
 			# print centerCar, centerCarInit
 		bestAngle = 2 * angle - orientCarInit
 			# print "angles", angle, orientCarInit, bestAngle, orientCar
+		#print "angle", angle
+		#print "orientCarInit", orientCarInit
+		#print "bestAngle", bestAngle
 
 		score2 = abs(bestAngle - orientCar)
                 
 		center, orient = car.getCenterAndOrient();
-		prot = 30.0
+		prot = 50.0
 		tail = 20.0
 		side = 10.0
 		carShade = RecObstacle(center[0] + (prot - tail)/2*math.cos(orient), center[1] + (prot - tail)/2*math.sin(orient), car.geometry.length + prot + tail, car.geometry.width + side, orient)
@@ -319,10 +329,8 @@ class TwoStepAgent(Agent):
 		            num += 1
 		score3 = -num
 
-		print numInPark, dist
-		# print score1*0.005, score2*15, score3*100
-
-		return score1*0.005 - 15*score2 + 100*score3
+		print 0.01*score1, - 40*score2, 60*score3
+		return 0.01*score1 - 40*score2 + 60*score3 - 10*abs(centerCarInit[1] - centerCar[1])
 
 	def calculateCarPos(self, gameState):
 		carState = gameState.getCarPosition()
