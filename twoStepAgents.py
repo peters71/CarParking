@@ -286,7 +286,7 @@ class TwoStepAgent(Agent):
 				numInPark += 1
 
 
-		score1 = -numInPark*100 + dist - 200 * (centerCar[1] - centerObs[1])+ 0.1/(orientDiff+0.01)
+		score1 = -numInPark*100 + dist - 0 * 200 * (centerCar[1] - centerObs[1])+ 0 * 0.1/(orientDiff+0.01)
 
 		carInit = initialState.data.agentStates[0].car
 		centerCarInit, orientCarInit = carInit.getPosAndOrient()
@@ -297,11 +297,14 @@ class TwoStepAgent(Agent):
 			# print centerCar, centerCarInit
 		bestAngle = 2 * angle - orientCarInit
 			# print "angles", angle, orientCarInit, bestAngle, orientCar
+                print "angle", angle
+                print "orientCarInit", orientCarInit
+                print "bestAngle", bestAngle
 
 		score2 = abs(bestAngle - orientCar)
                 
                 center, orient = car.getCenterAndOrient();
-                prot = 30.0
+                prot = 50.0
                 tail = 20.0
                 side = 10.0
                 carShade = RecObstacle(center[0] + (prot - tail)/2*math.cos(orient), center[1] + (prot - tail)/2*math.sin(orient), car.geometry.length + prot + tail, car.geometry.width + side, orient)
@@ -321,7 +324,7 @@ class TwoStepAgent(Agent):
 
 		# print score1, score2
 
-		return score1 + 15*score2 + 100*score3
+		return 0.01*score1 - 40*score2 + 60*score3
 
 	def calculateCarPos(self, gameState):
 		carState = gameState.getCarPosition()
