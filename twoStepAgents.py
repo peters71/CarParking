@@ -41,8 +41,17 @@ class TwoStepAgent(Agent):
 
 		destStateCenterAndOrientInfo = gameState.data.layout.goldenParkingSpace.getCenterAndOrient()
 
-		destinationState = gameState.deepCopy()
-		destinationState.data.agentStates[0].car.setPosAndOrient(destStateCenterAndOrientInfo)
+		destinationStateOne = gameState.deepCopy()
+		destinationStateOne.data.agentStates[0].car.setPosAndOrient(destStateCenterAndOrientInfo)
+
+		#orient = destStateCenterAndOrientInfo[1]
+		#if orient >= 0:
+		#destStateCenterAndOrientInfo[1] = orient - 3.14159
+		#else:
+		#	destStateCenterAndOrientInfo[1] = orient + 3.14159
+		destinationStateTwo = gameState.deepCopy()
+		destinationStateTwo.data.agentStates[0].car.setPosAndOrient(destStateCenterAndOrientInfo)
+		# destinationState.data.agentStates[0].car.setPosAndOrientReverse(destStateCenterAndOrientInfo)
 
 		# print destinationState.getCarPosition()
 
@@ -51,8 +60,8 @@ class TwoStepAgent(Agent):
 		itr = numAction/firstX
 
 		# statein = destinationState
-		destinationStateOne = destinationState
-		destinationStateTwo = destinationState
+		#destinationStateOne = destinationState
+		#destinationStateTwo = destinationState
 		'''     
 		for t in range(itr):
 			print 'beam search'
@@ -73,6 +82,7 @@ class TwoStepAgent(Agent):
 		else:
 			self.middleState = middleStateTwo
 
+		# self.middleState = destinationStateOne
 		self.middleStatePos = self.calculateCarPos(self.middleState)
 
 		# self.middleState = statein
@@ -98,7 +108,7 @@ class TwoStepAgent(Agent):
 		countMiddle = 0
 		bestScoreGameList = []
 
-		beamSearch = 50
+		beamSearch = 80
 		depth = numAction
 		gameStateListNextLevel = []
 		
@@ -266,7 +276,8 @@ class TwoStepAgent(Agent):
 		centerObs, orientObs = park.getCenterAndOrient()
 		dist = ((centerCar[0] - centerObs[0])**2 + (centerCar[1] - centerObs[1])**2)**0.5
 		angle = math.atan((centerCar[1] - centerObs[1])/(centerCar[0] - centerObs[0]))
-		orientDiff = min([abs(orientCar - orientObs - 3.14159), abs(orientCar - orientObs)])
+		# orientDiff = min([abs(orientCar - orientObs - 3.14159), abs(orientCar - orientObs)])
+		orientDiff = abs(orientCar - orientObs)
 
 		numInPark = 0
 		for v in car.getVertices():
